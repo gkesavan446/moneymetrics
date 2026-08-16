@@ -106,6 +106,60 @@ export const getTransactions = async (req, res, next) => {
     }
 }
 
+export const updateTransaction = async (req, res, next) => {
+
+    try {
+        const { id } = req.params
+        const { type, category, amount, description, date } = req.body;
+
+        if (!type || !category || !amount || !description || !date) {
+            return res.status(400).json({ message: "All transaction fields are required" });
+        }
+
+        if (!["income", "expense"].includes(type)) {
+            return res.status(400).json({ message: "Invalid transaction type" });
+
+        }
+
+        if (Number(amount) <= 0) {
+            return res.status(400).json({ message: "Amount must be greater than 0" });
+        }
+
+        const transaction = await Transaction.findOneAndUpdate(
+            { _id: id, userId: req.user.userId },
+            { type, category, amount, description, date },
+            { returnDocument: "after", runValidators: true }
+        )
+
+        if (!transaction) {
+            return res.status(404).json({ message: "Transaction not found" });
+        }
+
+        res.status(200).json({ message: "Transaction updated successfully", transaction })
+
+    } catch (error) {
+        next(error)
+    }
+};
+
+
+export const deleteTransaction = async (req, res, next) => {
+    try {
+        const { id } = req.params
+
+        const transaction = await Transaction.findOneAndDelete({ _id: id, userId: req.user.userId });
+
+        if (!transaction) {
+            return res.status(404).json({ message: "Transaction not found" });
+        }
+
+        res.status(200).json({ message: "Transaction deleted successfully" });
+
+    } catch (error) {
+        next(error)
+    }
+}
+
 
 // export const getTransactions = async (req, res, next) => {
 //     try {
