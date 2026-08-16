@@ -70,7 +70,7 @@ export const login = async (req, res, next) => {
     }
 };
 
-export const getme = async (req, res, next) => {
+export const getMe = async (req, res, next) => {
     try {
         const user = await User.findById(req.user.userId).select("-password -resetOtp -resetOtpExpires")
 
