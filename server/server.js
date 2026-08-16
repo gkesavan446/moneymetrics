@@ -6,7 +6,8 @@ import cookieParser from 'cookie-parser';
 import connectDB from './config/db.js';
 import authRouter from './routes/authRoutes.js'
 import errorMiddleware from './middleware/errorMiddleware.js';
-import transactionRouter from './routes/transactionRoutes.js'
+import transactionRouter from './routes/transactionRoutes.js';
+import dashboardRouter from './routes/dashboardRoutes.js';
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRouter);
 app.use("/api/transactions", transactionRouter);
+app.use("/api/dashboard", dashboardRouter);
 
 app.use(errorMiddleware);
 

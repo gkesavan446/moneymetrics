@@ -46,26 +46,17 @@ export const getTransactions = async (req, res, next) => {
 
         if (type) {
             if (!["income", "expense"].includes(type)) {
-                return res.status(400).json({
-                    message: "Invalid transaction type"
-                });
+                return res.status(400).json({ message: "Invalid transaction type" });
             }
-
             filter.type = type;
         }
 
         if (category) {
-            filter.category = {
-                $regex: `^${category}$`,
-                $options: "i"
-            };
+            filter.category = { $regex: `^${category}$`, $options: "i" };
         }
 
         if (search) {
-            filter.description = {
-                $regex: search,
-                $options: "i"
-            };
+            filter.description = { $regex: search, $options: "i" };
         }
 
         if (from || to) {
@@ -141,7 +132,6 @@ export const updateTransaction = async (req, res, next) => {
         next(error)
     }
 };
-
 
 export const deleteTransaction = async (req, res, next) => {
     try {
