@@ -8,6 +8,7 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import DashboardLayout from "./layouts/DashboardLayout.jsx";
+import Transactions from "./pages/Transactions.jsx";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route  element={<ProtectedRoute />}>
               <Route element={<DashboardLayout/>}>
                 <Route path="/dashboard" element={<Dashboard/>}/>
+                <Route path="/transactions" element={<Transactions/>}/>
               </Route>
           </Route>
       </Routes>

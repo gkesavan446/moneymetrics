@@ -55,8 +55,25 @@ export const getTransactions = async (req, res, next) => {
             filter.category = { $regex: `^${category}$`, $options: "i" };
         }
 
+        // if (search) {
+        //     filter.description = { $regex: search, $options: "i" };
+        // }
+
         if (search) {
-            filter.description = { $regex: search, $options: "i" };
+            query.$or = [
+                {
+                    description: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                },
+                {
+                    category: {
+                        $regex: search,
+                        $options: "i"
+                    }
+                }
+            ];
         }
 
         if (from || to) {
