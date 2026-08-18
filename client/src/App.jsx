@@ -4,7 +4,10 @@ import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
-import ResetPassword from "./pages/ResetPassword.jsx"
+import ResetPassword from "./pages/ResetPassword.jsx";
+
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import DashboardLayout from "./layouts/DashboardLayout.jsx";
 
 function App() {
   return (
@@ -13,8 +16,12 @@ function App() {
         <Route path="/login" element={<Login/>}/>
         <Route path="/register" element={<Register/>}/>
         <Route path="/forgotpassword" element={<ForgotPassword/>}/>
-        <Route path="/dashboard" element={<Dashboard/>}/>
         <Route path="/resetpassword" element={<ResetPassword/>}/>
+          <Route  element={<ProtectedRoute />}>
+              <Route element={<DashboardLayout/>}>
+                <Route path="/dashboard" element={<Dashboard/>}/>
+              </Route>
+          </Route>
       </Routes>
     </Router>
   );

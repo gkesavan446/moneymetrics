@@ -6,6 +6,6 @@ const router = Router();
 
 router.get('/summary', authMiddleware, getDashboardSummary)
 router.get('/monthly', authMiddleware, getMonthlySummary)
-router.get('/expensebycategory', authMiddleware, getExpenseByCategory)
+router.get('/expense-by-category', authMiddleware, getExpenseByCategory)
 
 export default router;
