@@ -59,8 +59,10 @@ export const getTransactions = async (req, res, next) => {
         //     filter.description = { $regex: search, $options: "i" };
         // }
 
+        // const query = { userId: req.user.userId };
+
         if (search) {
-            query.$or = [
+            filter.$or = [
                 {
                     description: {
                         $regex: search,
@@ -75,6 +77,9 @@ export const getTransactions = async (req, res, next) => {
                 }
             ];
         }
+
+        // console.log("Search:", search);
+        // console.log("Query:", query);
 
         if (from || to) {
             filter.date = {};
@@ -95,6 +100,9 @@ export const getTransactions = async (req, res, next) => {
         const transactions = await Transaction.find(filter)
             .sort(sortOption).skip(skip).limit(limitNumber)
 
+        // const testTransactions = await Transaction.find(query);
+        // console.log("MATCHING TRANSACTIONS:", testTransactions);
+
         const totalTransactions = await Transaction.countDocuments(filter);
 
         const totalPages = Math.ceil(totalTransactions / limitNumber)
@@ -113,6 +121,23 @@ export const getTransactions = async (req, res, next) => {
         next(error)
     }
 }
+
+export const getTransactionById = async (req, res, next) => {
+    try {
+        const { id } = req.params;
+
+        const transaction = await Transaction.findOne({ _id: id, userId: req.user.userId });
+
+        if (!transaction) {
+            return res.status(404).json({ message: "Transaction not found" });
+        }
+
+        res.status(200).json({ transaction });
+
+    } catch (error) {
+        next(error);
+    }
+};
 
 export const updateTransaction = async (req, res, next) => {
 
