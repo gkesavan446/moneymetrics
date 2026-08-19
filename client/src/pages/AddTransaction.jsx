@@ -1,12 +1,9 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import api from "../services/api.js";
-import { usePlotArea } from "recharts";
 
+function AddTransaction(){
 
-function EditTransaction(){
-
-    const {id} = useParams();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -17,49 +14,19 @@ function EditTransaction(){
         date: ""
     });
 
-    const [loading, setLoading] = useState(true)
-    const [saving, setSaving] = useState(false)
-    const [error, setError] = useState("")
-
-    useEffect(()=>{
-        const getTransaction = async () => {
-            try {
-                setLoading(true);
-                setError("");
-
-                const response = await api.get(`/transactions/${id}`)
-                
-                const transaction = response.data.transaction
-                // console.log("pipeconnection", transaction)
-                setFormData({
-                    type: transaction.type,
-                    category: transaction.category,
-                    amount: transaction.amount,
-                    description: transaction.description,
-                    date: transaction.date.split("T")[0]
-                });
-
-                
-            } catch (error) {
-                console.log("error", error)
-                setError(error.response?.data?.message || "Failed to load transactionsss");
-            } finally {
-                setLoading(false)
-            }
-        }
-        getTransaction()
-    }, [id])
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const incomeCategories = ["Salary", "Freelance", "Business", "Investment", "Other"];
 
     const expenseCategories = ["Food", "Transport", "Shopping", "Bills", 
         "Entertainment", "Health", "Education", "Travel",  "Other"];
 
-    const categories = formData.type === "income" ? incomeCategories : expenseCategories
-
+    const categories = formData.type === "income" ? incomeCategories : 
+                formData.type === "expense" ? expenseCategories : [];
+    
     const handleChange = (e) => {
-        const {name, value} = e.target
-
+        const { name, value} = e.target;
         setFormData({
             ...formData, [name]: value
         })
@@ -71,40 +38,37 @@ function EditTransaction(){
             type: e.target.value,
             category: ""
         })
-    }
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            setSaving(true);
+            setLoading(true);
             setError("");
 
-            await api.put(`/transactions/${id}`, {
+            await api.post("/transactions", {
                 ...formData, amount: Number(formData.amount)
             })
-            navigate('/transactions')
+            navigate("/transactions")
         } catch (error) {
-            setError(error.response?.data?.message || "Failed to update transaction");
+            setError(error.response?.data?.message || "Failed to create transaction");
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
-    }
+    };
 
-    if(loading){
-        return <p>Loading Transaction....</p>
-    }
 
     return (
         <div className="max-w-2xl">
 
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-800">
-          Edit Transaction
+          Add Transaction
         </h2>
 
         <p className="text-gray-500 mt-1">
-          Update your transaction details.
+          Add a new income or expense.
         </p>
       </div>
 
@@ -120,6 +84,8 @@ function EditTransaction(){
           onSubmit={handleSubmit}
           className="space-y-5"
         >
+
+          {/* Type */}
 
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -148,6 +114,8 @@ function EditTransaction(){
           </div>
 
 
+          {/* Category */}
+
           <div>
             <label className="block text-sm font-medium mb-1">
               Category
@@ -157,7 +125,8 @@ function EditTransaction(){
               name="category"
               value={formData.category}
               onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
+              disabled={!formData.type}
+              className="w-full border rounded-lg px-4 py-2 disabled:bg-gray-100"
               required
             >
               <option value="">
@@ -172,9 +141,12 @@ function EditTransaction(){
                   {category}
                 </option>
               ))}
+
             </select>
           </div>
 
+
+          {/* Amount */}
 
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -188,11 +160,14 @@ function EditTransaction(){
               min="0.01"
               value={formData.amount}
               onChange={handleChange}
+              placeholder="Enter amount"
               className="w-full border rounded-lg px-4 py-2"
               required
             />
           </div>
 
+
+          {/* Description */}
 
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -204,11 +179,14 @@ function EditTransaction(){
               name="description"
               value={formData.description}
               onChange={handleChange}
+              placeholder="Enter description"
               className="w-full border rounded-lg px-4 py-2"
               required
             />
           </div>
 
+
+          {/* Date */}
 
           <div>
             <label className="block text-sm font-medium mb-1">
@@ -226,23 +204,23 @@ function EditTransaction(){
           </div>
 
 
+          {/* Buttons */}
+
           <div className="flex gap-3">
 
             <button
               type="submit"
-              disabled={saving}
+              disabled={loading}
               className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
             >
-              {saving
-                ? "Updating..."
-                : "Update Transaction"}
+              {loading
+                ? "Adding..."
+                : "Add Transaction"}
             </button>
 
             <button
               type="button"
-              onClick={() =>
-                navigate("/transactions")
-              }
+              onClick={() => navigate("/transactions")}
               className="border px-5 py-2 rounded-lg hover:bg-gray-50"
             >
               Cancel
@@ -257,7 +235,6 @@ function EditTransaction(){
     </div>
   
     )
-};
+}
 
-
-export default EditTransaction;
+export default AddTransaction;

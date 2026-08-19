@@ -17,7 +17,7 @@ function Sidebar(){
           Dashboard
         </NavLink>
 
-        <NavLink to="/transactions" className={linkClass}>
+        <NavLink to="/transactions" end className={linkClass}>
           Transactions
         </NavLink>
 

@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute.jsx";
 import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import Transactions from "./pages/Transactions.jsx";
 import EditTransaction from "./pages/EditTransaction.jsx";
+import AddTransaction from "./pages/AddTransaction.jsx";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
                 <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/transactions" element={<Transactions/>}/>
                 <Route path="/transactions/edit/:id"  element={<EditTransaction />}/>
+                <Route path="/transactions/add"  element={<AddTransaction />}/>
               </Route>
           </Route>
       </Routes>

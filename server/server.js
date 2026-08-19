@@ -8,6 +8,7 @@ import authRouter from './routes/authRoutes.js'
 import errorMiddleware from './middleware/errorMiddleware.js';
 import transactionRouter from './routes/transactionRoutes.js';
 import dashboardRouter from './routes/dashboardRoutes.js';
+import reportRouter from './routes/reportRoutes.js';
 
 dotenv.config();
 
@@ -33,6 +34,7 @@ app.get('/', (req, res) => {
 app.use('/api/auth', authRouter);
 app.use("/api/transactions", transactionRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/reports", reportRouter);
 
 app.use(errorMiddleware);
 

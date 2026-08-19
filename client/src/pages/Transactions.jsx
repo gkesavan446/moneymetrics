@@ -69,6 +69,23 @@ const [sort, setSort] = useState("latest");
     }
   };
 
+  const handleDelete = async (id) => {
+
+    const confirmDelete = window.confirm( "Are you sure you want to delete this transaction?");
+
+    if(!confirmDelete) return ;
+
+    try {
+      await api.delete(`/transactions/${id}`);
+
+      setTransactions((prev)=> prev.filter(transaction => transaction._id !== id));
+      setPagination((prev)=> ({...prev, totalTransactions: prev.totalTransactions - 1}));
+
+    } catch (error) {
+      setError(error.response?.data?.message || "Failed to delete transaction");
+    }
+  }
+
   if (loading) {
     return <p>Loading Transactions....</p>
   }
@@ -385,6 +402,7 @@ const [sort, setSort] = useState("latest");
                         </Link>
 
                         <button
+                         onClick={() => handleDelete(transaction._id)}
                           className="text-red-500 hover:text-red-700"
                         >
                           Delete
