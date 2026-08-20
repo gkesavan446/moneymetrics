@@ -12,6 +12,7 @@ import Transactions from "./pages/Transactions.jsx";
 import EditTransaction from "./pages/EditTransaction.jsx";
 import AddTransaction from "./pages/AddTransaction.jsx";
 import Reports from "./pages/Reports.jsx";
+import NotFound from "./pages/NotFound.jsx";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/reports"  element={<Reports />}/>
               </Route>
           </Route>
+          <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

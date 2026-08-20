@@ -1,122 +1,204 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { WalletCards } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import api from "../services/api.js";
 
 function Login() {
+  const [formData, setFormData] = useState({
+    email: "",
+    password: ""
+  });
 
-    const [formData, setFormData] = useState({
-      email: "",
-      password: ""
-    })
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+  const { setUser } = useAuth();
+  const navigate = useNavigate();
 
-    const {setUser} = useAuth();
-    const navigate = useNavigate();
+  const handleChange = (e) => {
+    const { name, value } = e.target;
 
-    const handleChange = (e) => {
-      const { name, value} = e.target
-      setFormData({
-        ...formData, [name]: value
-      });
-    };
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-      try {
-          setError("")
-          setLoading(true)
+    try {
+      setError("");
+      setLoading(true);
 
-          const response = await api.post("/auth/login", formData)
-          setUser(response.data.user);
-          console.log("response.data.user", response)
-          navigate('/dashboard')
-      } catch (error) {
-        setError(error.response?.data?.message || "Login Failed")
-      } finally {
-        setLoading(false);
-      }
+      const response = await api.post(
+        "/auth/login",
+        formData
+      );
+
+      setUser(response.data.user);
+
+      navigate("/dashboard");
+
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+        "Login failed"
+      );
+
+    } finally {
+      setLoading(false);
     }
+  };
 
   return (
-     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
-      <div className="w-full max-w-md bg-white p-8 rounded-lg shadow">
-        <h1 className="text-3xl font-bold text-center mb-6">
-          Money Metrics
-        </h1>
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4 py-8">
 
-        <h2 className="text-xl font-semibold mb-6">
-          Login
-        </h2>
+      <div className="w-full max-w-md">
 
-        {error && (
-          <p className="text-red-500 mb-4">
-            {error}
+        {/* Brand */}
+
+        <div className="flex flex-col items-center mb-6">
+
+          <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
+
+            <WalletCards
+              size={26}
+              className="text-emerald-600"
+            />
+
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+            Money Metrics
+          </h1>
+
+          <p className="text-sm text-gray-500 mt-1 text-center">
+            Track your money. Understand your spending.
           </p>
-        )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block mb-1">
-              Email
-            </label>
-
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full border rounded-md px-3 py-2"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block mb-1">
-              Password
-            </label>
-
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full border rounded-md px-3 py-2"
-              required
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-black text-white py-2 rounded-md"
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-
-        <div className="mt-4 text-sm">
-          <Link
-            to="/forgotpassword"
-            className="text-blue-600"
-          >
-            Forgot password?
-          </Link>
         </div>
 
-        <p className="mt-4 text-sm">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="text-blue-600"
+
+        {/* Login Card */}
+
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-7 shadow-sm">
+
+          <div className="mb-6">
+
+            <h2 className="text-xl font-semibold text-gray-800">
+              Welcome back
+            </h2>
+
+            <p className="text-sm text-gray-500 mt-1">
+              Sign in to continue to your dashboard.
+            </p>
+
+          </div>
+
+
+          {/* Error */}
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-3 mb-5 text-sm">
+              {error}
+            </div>
+          )}
+
+
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-5"
           >
-            Register
-          </Link>
-        </p>
+
+            {/* Email */}
+
+            <div>
+
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Email
+              </label>
+
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="Enter your email"
+                className="w-full h-11 border border-gray-300 rounded-lg px-4 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                required
+              />
+
+            </div>
+
+
+            {/* Password */}
+
+            <div>
+
+              <div className="flex items-center justify-between mb-1.5">
+
+                <label className="text-sm font-medium text-gray-700">
+                  Password
+                </label>
+
+                <Link
+                  to="/forgotpassword"
+                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                >
+                  Forgot password?
+                </Link>
+
+              </div>
+
+              <input
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Enter your password"
+                className="w-full h-11 border border-gray-300 rounded-lg px-4 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                required
+              />
+
+            </div>
+
+
+            {/* Submit */}
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 bg-emerald-600 text-white font-medium rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            >
+              {loading
+                ? "Logging in..."
+                : "Login"}
+            </button>
+
+          </form>
+
+
+          {/* Register */}
+
+          <p className="mt-6 text-sm text-gray-500 text-center">
+
+            Don't have an account?{" "}
+
+            <Link
+              to="/register"
+              className="font-medium text-emerald-600 hover:text-emerald-700"
+            >
+              Register
+            </Link>
+
+          </p>
+
+        </div>
+
       </div>
+
     </div>
   );
 }

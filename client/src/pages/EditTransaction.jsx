@@ -1,119 +1,173 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Save } from "lucide-react";
 import api from "../services/api.js";
-import { usePlotArea } from "recharts";
 
+function EditTransaction() {
+  const { id } = useParams();
+  const navigate = useNavigate();
 
-function EditTransaction(){
+  const [formData, setFormData] = useState({
+    type: "",
+    category: "",
+    amount: "",
+    description: "",
+    date: ""
+  });
 
-    const {id} = useParams();
-    const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
-    const [formData, setFormData] = useState({
-         type: "",
-        category: "",
-        amount: "",
-        description: "",
-        date: ""
-    });
+  const incomeCategories = [
+    "Salary",
+    "Freelance",
+    "Business",
+    "Investment",
+    "Other"
+  ];
 
-    const [loading, setLoading] = useState(true)
-    const [saving, setSaving] = useState(false)
-    const [error, setError] = useState("")
+  const expenseCategories = [
+    "Food",
+    "Transport",
+    "Shopping",
+    "Bills",
+    "Entertainment",
+    "Health",
+    "Education",
+    "Travel",
+    "Other"
+  ];
 
-    useEffect(()=>{
-        const getTransaction = async () => {
-            try {
-                setLoading(true);
-                setError("");
+  const categories =
+    formData.type === "income"
+      ? incomeCategories
+      : formData.type === "expense"
+      ? expenseCategories
+      : [];
 
-                const response = await api.get(`/transactions/${id}`)
-                
-                const transaction = response.data.transaction
-                // console.log("pipeconnection", transaction)
-                setFormData({
-                    type: transaction.type,
-                    category: transaction.category,
-                    amount: transaction.amount,
-                    description: transaction.description,
-                    date: transaction.date.split("T")[0]
-                });
+  useEffect(() => {
+    const getTransaction = async () => {
+      try {
+        setLoading(true);
+        setError("");
 
-                
-            } catch (error) {
-                console.log("error", error)
-                setError(error.response?.data?.message || "Failed to load transactions");
-            } finally {
-                setLoading(false)
-            }
-        }
-        getTransaction()
-    }, [id])
+        const response = await api.get(
+          `/transactions/${id}`
+        );
 
-    const incomeCategories = ["Salary", "Freelance", "Business", "Investment", "Other"];
-
-    const expenseCategories = ["Food", "Transport", "Shopping", "Bills", 
-        "Entertainment", "Health", "Education", "Travel",  "Other"];
-
-    const categories = formData.type === "income" ? incomeCategories : expenseCategories
-
-    const handleChange = (e) => {
-        const {name, value} = e.target
+        const transaction =
+          response.data.transaction;
 
         setFormData({
-            ...formData, [name]: value
-        })
+          type: transaction.type,
+          category: transaction.category,
+          amount: transaction.amount,
+          description: transaction.description,
+          date: transaction.date.split("T")[0]
+        });
+
+      } catch (error) {
+        setError(
+          error.response?.data?.message ||
+          "Failed to load transaction"
+        );
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const handleTypeChange = (e) => {
-        setFormData({
-            ...formData,
-            type: e.target.value,
-            category: ""
-        })
+    getTransaction();
+
+  }, [id]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleTypeChange = (e) => {
+    setFormData({
+      ...formData,
+      type: e.target.value,
+      category: ""
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      setSaving(true);
+      setError("");
+
+      await api.put(`/transactions/${id}`, {
+        ...formData,
+        amount: Number(formData.amount)
+      });
+
+      navigate("/transactions");
+
+    } catch (error) {
+      setError(
+        error.response?.data?.message ||
+        "Failed to update transaction"
+      );
+    } finally {
+      setSaving(false);
     }
+  };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-
-        try {
-            setSaving(true);
-            setError("");
-
-            await api.put(`/transactions/${id}`, {
-                ...formData, amount: Number(formData.amount)
-            })
-            navigate('/transactions')
-        } catch (error) {
-            setError(error.response?.data?.message || "Failed to update transaction");
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    if(loading){
-        return <p>Loading Transaction....</p>
-    }
-
+  if (loading) {
     return (
-        <div className="max-w-2xl">
+      <div className="flex items-center justify-center min-h-[300px]">
+        <p className="text-gray-500">
+          Loading transaction...
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="w-full max-w-3xl mx-auto">
+
+      {/* Header */}
 
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">
+
+        <button
+          onClick={() =>
+            navigate("/transactions")
+          }
+          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-800 mb-4"
+        >
+          <ArrowLeft size={17} />
+          Back to Transactions
+        </button>
+
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
           Edit Transaction
         </h2>
 
-        <p className="text-gray-500 mt-1">
+        <p className="text-sm sm:text-base text-gray-500 mt-1">
           Update your transaction details.
         </p>
+
       </div>
 
-      <div className="bg-white border rounded-xl p-6">
+
+      {/* Form Card */}
+
+      <div className="bg-white border border-gray-200 rounded-xl p-4 sm:p-6">
 
         {error && (
-          <p className="text-red-500 mb-4">
+          <div className="bg-red-50 border border-red-200 text-red-600 rounded-lg px-4 py-3 mb-5 text-sm">
             {error}
-          </p>
+          </div>
         )}
 
         <form
@@ -121,81 +175,112 @@ function EditTransaction(){
           className="space-y-5"
         >
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Type
-            </label>
+          {/* Type + Category */}
 
-            <select
-              name="type"
-              value={formData.type}
-              onChange={handleTypeChange}
-              className="w-full border rounded-lg px-4 py-2"
-              required
-            >
-              <option value="">
-                Select type
-              </option>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-              <option value="income">
-                Income
-              </option>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Type
+              </label>
 
-              <option value="expense">
-                Expense
-              </option>
-            </select>
-          </div>
-
-
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Category
-            </label>
-
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
-              required
-            >
-              <option value="">
-                Select category
-              </option>
-
-              {categories.map((category) => (
-                <option
-                  key={category}
-                  value={category}
-                >
-                  {category}
+              <select
+                name="type"
+                value={formData.type}
+                onChange={handleTypeChange}
+                className="w-full h-11 border border-gray-300 rounded-lg px-4 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                required
+              >
+                <option value="">
+                  Select type
                 </option>
-              ))}
-            </select>
+
+                <option value="income">
+                  Income
+                </option>
+
+                <option value="expense">
+                  Expense
+                </option>
+              </select>
+            </div>
+
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Category
+              </label>
+
+              <select
+                name="category"
+                value={formData.category}
+                onChange={handleChange}
+                disabled={!formData.type}
+                className="w-full h-11 border border-gray-300 rounded-lg px-4 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                required
+              >
+                <option value="">
+                  Select category
+                </option>
+
+                {categories.map((category) => (
+                  <option
+                    key={category}
+                    value={category}
+                  >
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
           </div>
 
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Amount
-            </label>
+          {/* Amount + Date */}
 
-            <input
-              type="number"
-              name="amount"
-              step="0.01"
-              min="0.01"
-              value={formData.amount}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Amount
+              </label>
+
+              <input
+                type="number"
+                name="amount"
+                step="0.01"
+                min="0.01"
+                value={formData.amount}
+                onChange={handleChange}
+                className="w-full h-11 border border-gray-300 rounded-lg px-4 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                required
+              />
+            </div>
+
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Date
+              </label>
+
+              <input
+                type="date"
+                name="date"
+                value={formData.date}
+                onChange={handleChange}
+                className="w-full h-11 border border-gray-300 rounded-lg px-4 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                required
+              />
+            </div>
+
           </div>
 
 
+          {/* Description */}
+
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Description
             </label>
 
@@ -204,48 +289,37 @@ function EditTransaction(){
               name="description"
               value={formData.description}
               onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
+              className="w-full h-11 border border-gray-300 rounded-lg px-4 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
               required
             />
           </div>
 
 
-          <div>
-            <label className="block text-sm font-medium mb-1">
-              Date
-            </label>
+          {/* Buttons */}
 
-            <input
-              type="date"
-              name="date"
-              value={formData.date}
-              onChange={handleChange}
-              className="w-full border rounded-lg px-4 py-2"
-              required
-            />
-          </div>
-
-
-          <div className="flex gap-3">
-
-            <button
-              type="submit"
-              disabled={saving}
-              className="bg-emerald-600 text-white px-5 py-2 rounded-lg hover:bg-emerald-700 disabled:opacity-50"
-            >
-              {saving
-                ? "Updating..."
-                : "Update Transaction"}
-            </button>
+          <div className="flex flex-col-reverse sm:flex-row gap-3 pt-2">
 
             <button
               type="button"
               onClick={() =>
                 navigate("/transactions")
               }
-              className="border px-5 py-2 rounded-lg hover:bg-gray-50"
+              className="w-full sm:w-auto border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-50 transition"
             >
               Cancel
+            </button>
+
+
+            <button
+              type="submit"
+              disabled={saving}
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-600 text-white px-5 py-2.5 rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition"
+            >
+              <Save size={18} />
+
+              {saving
+                ? "Updating..."
+                : "Update Transaction"}
             </button>
 
           </div>
@@ -255,9 +329,7 @@ function EditTransaction(){
       </div>
 
     </div>
-  
-    )
-};
-
+  );
+}
 
 export default EditTransaction;

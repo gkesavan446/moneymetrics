@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+
 import {
   LineChart,
   Line,
@@ -13,8 +15,16 @@ import {
   Cell
 } from "recharts";
 
+import {
+  Wallet,
+  TrendingDown,
+  Landmark,
+  PiggyBank
+} from "lucide-react";
+
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
+
 
 function Dashboard() {
   const { user } = useAuth();
@@ -26,6 +36,7 @@ function Dashboard() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
 
   useEffect(() => {
     const getDashboardData = async () => {
@@ -58,10 +69,11 @@ function Dashboard() {
         setRecentTransactions(
           transactionsResponse.data.transactions
         );
+
       } catch (error) {
         setError(
           error.response?.data?.message ||
-            "Failed to load dashboard"
+          "Failed to load dashboard"
         );
       } finally {
         setLoading(false);
@@ -69,11 +81,13 @@ function Dashboard() {
     };
 
     getDashboardData();
+
   }, []);
+
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center min-h-[300px]">
         <p className="text-gray-500">
           Loading dashboard...
         </p>
@@ -81,9 +95,10 @@ function Dashboard() {
     );
   }
 
+
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border border-red-200 rounded-xl p-4">
         <p className="text-red-600">
           {error}
         </p>
@@ -91,85 +106,198 @@ function Dashboard() {
     );
   }
 
+
   const savingsPercentage =
     summary?.totalIncome > 0
       ? (
-          (summary.balance / summary.totalIncome) *
+          (summary.balance /
+            summary.totalIncome) *
           100
         ).toFixed(1)
       : 0;
 
+
+  const monthNames = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec"
+  ];
+
+
+  const formattedMonthlySummary =
+    monthlySummary.map((item) => ({
+      ...item,
+
+      monthLabel:
+        `${monthNames[item.month - 1]} ${item.year}`
+    }));
+
+
+  const PIE_COLORS = [
+    "#3B82F6",
+    "#EF4444",
+    "#F59E0B",
+    "#8B5CF6",
+    "#14B8A6",
+    "#F97316",
+    "#EC4899",
+    "#6366F1"
+  ];
+
+
   return (
-    <div>
-      {/* Dashboard Header */}
+    <div className="w-full">
+
+      {/* Header */}
 
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">
-          Good evening, {user?.name} 👋
+
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+          Good evening, {user?.name.slice(0,1).toUpperCase() + user?.name.slice(1)    } 👋
         </h2>
 
-        <p className="text-gray-500 mt-1">
+        <p className="text-sm sm:text-base text-gray-500 mt-1">
           Here's your financial overview.
         </p>
+
       </div>
 
 
       {/* Summary Cards */}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
 
-        {/* Total Income */}
+        {/* Income */}
 
-        <div className="bg-white rounded-xl border p-5">
-          <p className="text-sm text-gray-500">
-            Total Income
-          </p>
+        <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4">
 
-          <h3 className="text-2xl font-bold text-emerald-600 mt-2">
-            ₹
-            {summary?.totalIncome?.toLocaleString("en-IN")}
-          </h3>
+          <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
+
+            <Wallet
+              className="text-emerald-600"
+              size={24}
+            />
+
+          </div>
+
+
+          <div className="min-w-0">
+
+            <p className="text-sm text-gray-500">
+              Total Income
+            </p>
+
+            <h3 className="text-xl sm:text-2xl font-bold text-emerald-600 mt-1 break-words">
+              ₹
+              {summary?.totalIncome?.toLocaleString(
+                "en-IN"
+              )}
+            </h3>
+
+          </div>
+
         </div>
 
 
-        {/* Total Expenses */}
+        {/* Expenses */}
 
-        <div className="bg-white rounded-xl border p-5">
-          <p className="text-sm text-gray-500">
-            Total Expenses
-          </p>
+        <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4">
 
-          <h3 className="text-2xl font-bold text-red-500 mt-2">
-            ₹
-            {summary?.totalExpense?.toLocaleString("en-IN")}
-          </h3>
+          <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+
+            <TrendingDown
+              className="text-red-500"
+              size={24}
+            />
+
+          </div>
+
+
+          <div className="min-w-0">
+
+            <p className="text-sm text-gray-500">
+              Total Expenses
+            </p>
+
+            <h3 className="text-xl sm:text-2xl font-bold text-red-500 mt-1 break-words">
+              ₹
+              {summary?.totalExpense?.toLocaleString(
+                "en-IN"
+              )}
+            </h3>
+
+          </div>
+
         </div>
 
 
-        {/* Current Balance */}
+        {/* Balance */}
 
-        <div className="bg-white rounded-xl border p-5">
-          <p className="text-sm text-gray-500">
-            Current Balance
-          </p>
+        <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4">
 
-          <h3 className="text-2xl font-bold text-gray-800 mt-2">
-            ₹
-            {summary?.balance?.toLocaleString("en-IN")}
-          </h3>
+          <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+
+            <Landmark
+              className="text-blue-600"
+              size={24}
+            />
+
+          </div>
+
+
+          <div className="min-w-0">
+
+            <p className="text-sm text-gray-500">
+              Current Balance
+            </p>
+
+            <h3 className="text-xl sm:text-2xl font-bold text-gray-800 mt-1 break-words">
+              ₹
+              {summary?.balance?.toLocaleString(
+                "en-IN"
+              )}
+            </h3>
+
+          </div>
+
         </div>
 
 
         {/* Savings */}
 
-        <div className="bg-white rounded-xl border p-5">
-          <p className="text-sm text-gray-500">
-            Savings
-          </p>
+        <div className="bg-white rounded-xl border border-gray-200 p-5 flex items-center gap-4">
 
-          <h3 className="text-2xl font-bold text-blue-600 mt-2">
-            {savingsPercentage}%
-          </h3>
+          <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center shrink-0">
+
+            <PiggyBank
+              className="text-purple-600"
+              size={24}
+            />
+
+          </div>
+
+
+          <div className="min-w-0">
+
+            <p className="text-sm text-gray-500">
+              Savings
+            </p>
+
+            <h3 className="text-xl sm:text-2xl font-bold text-purple-600 mt-1">
+              {savingsPercentage}%
+            </h3>
+
+          </div>
+
         </div>
 
       </div>
@@ -177,116 +305,189 @@ function Dashboard() {
 
       {/* Charts */}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6 mt-6">
+
 
         {/* Income vs Expenses */}
 
-        <div className="bg-white rounded-xl border p-5">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
 
           <div className="mb-5">
-            <h3 className="text-lg font-semibold text-gray-800">
+
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">
               Income vs Expenses
             </h3>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mt-1">
               Monthly financial activity
             </p>
-          </div>
-
-          <div className="w-full h-80">
-
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <LineChart data={monthlySummary}>
-
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                />
-
-                <XAxis
-                  dataKey="month"
-                />
-
-                <YAxis />
-
-                <Tooltip />
-
-                <Legend />
-
-                <Line
-                  type="monotone"
-                  dataKey="income"
-                  name="Income"
-                  stroke="#059669"
-                  strokeWidth={2}
-                />
-
-                <Line
-                  type="monotone"
-                  dataKey="expense"
-                  name="Expenses"
-                  stroke="#ef4444"
-                  strokeWidth={2}
-                />
-
-              </LineChart>
-            </ResponsiveContainer>
 
           </div>
+
+
+          {formattedMonthlySummary.length === 0 ? (
+
+            <div className="h-72 flex items-center justify-center">
+
+              <p className="text-gray-500 text-sm">
+                No monthly data available.
+              </p>
+
+            </div>
+
+          ) : (
+
+            <div className="w-full h-64 sm:h-72 lg:h-80">
+
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+
+                <LineChart
+                  data={formattedMonthlySummary}
+                  margin={{
+                    top: 10,
+                    right: 10,
+                    left: 0,
+                    bottom: 10
+                  }}
+                >
+
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="#e5e7eb"
+                  />
+
+                  <XAxis
+                    dataKey="monthLabel"
+                    tick={{
+                      fontSize: 12
+                    }}
+                  />
+
+                  <YAxis
+                    tick={{
+                      fontSize: 12
+                    }}
+                  />
+
+                  <Tooltip />
+
+                  <Legend />
+
+
+                  <Line
+                    type="monotone"
+                    dataKey="income"
+                    name="Income"
+                    stroke="#059669"
+                    strokeWidth={2}
+                    activeDot={{
+                      r: 6
+                    }}
+                  />
+
+
+                  <Line
+                    type="monotone"
+                    dataKey="expense"
+                    name="Expenses"
+                    stroke="#ef4444"
+                    strokeWidth={2}
+                    activeDot={{
+                      r: 6
+                    }}
+                  />
+
+                </LineChart>
+
+              </ResponsiveContainer>
+
+            </div>
+
+          )}
 
         </div>
 
 
         {/* Expenses by Category */}
 
-        <div className="bg-white rounded-xl border p-5">
+        <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5">
 
           <div className="mb-5">
-            <h3 className="text-lg font-semibold text-gray-800">
+
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">
               Expenses by Category
             </h3>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mt-1">
               Where your money is going
             </p>
-          </div>
-
-          <div className="w-full h-80">
-
-            <ResponsiveContainer
-              width="100%"
-              height="100%"
-            >
-              <PieChart>
-
-                <Pie
-                  data={expenseByCategory}
-                  dataKey="total"
-                  nameKey="category"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
-                  label
-                >
-
-                  {expenseByCategory.map(
-                    (entry, index) => (
-                      <Cell key={index} />
-                    )
-                  )}
-
-                </Pie>
-
-                <Tooltip />
-
-                <Legend />
-
-              </PieChart>
-            </ResponsiveContainer>
 
           </div>
+
+
+          {expenseByCategory.length === 0 ? (
+
+            <div className="h-72 flex items-center justify-center">
+
+              <p className="text-gray-500 text-sm">
+                No expense data available.
+              </p>
+
+            </div>
+
+          ) : (
+
+            <div className="w-full h-72 sm:h-80">
+
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+
+                <PieChart>
+
+                  <Pie
+                    data={expenseByCategory}
+                    dataKey="total"
+                    nameKey="category"
+                    cx="50%"
+                    cy="45%"
+                    outerRadius={90}
+                    label
+                  >
+
+                    {expenseByCategory.map(
+                      (entry, index) => (
+
+                        <Cell
+                          key={index}
+                          fill={
+                            PIE_COLORS[
+                              index %
+                                PIE_COLORS.length
+                            ]
+                          }
+                        />
+
+                      )
+                    )}
+
+                  </Pie>
+
+                  <Tooltip />
+
+                  <Legend />
+
+                </PieChart>
+
+              </ResponsiveContainer>
+
+            </div>
+
+          )}
 
         </div>
 
@@ -295,63 +496,77 @@ function Dashboard() {
 
       {/* Recent Transactions */}
 
-      <div className="bg-white rounded-xl border p-5 mt-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 mt-6">
 
-        <div className="flex items-center justify-between mb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-5">
 
           <div>
-            <h3 className="text-lg font-semibold text-gray-800">
+
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800">
               Recent Transactions
             </h3>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 mt-1">
               Your latest financial activity
             </p>
+
           </div>
 
-          <a
-            href="/transactions"
-            className="text-sm text-emerald-600 hover:underline"
+
+          <Link
+            to="/transactions"
+            className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
           >
             View all
-          </a>
+          </Link>
 
         </div>
 
 
         {recentTransactions.length === 0 ? (
 
-          <p className="text-gray-500 text-sm">
-            No transactions yet.
-          </p>
+          <div className="py-8 text-center">
+
+            <p className="text-gray-500 text-sm">
+              No transactions yet.
+            </p>
+
+          </div>
 
         ) : (
 
           <div className="overflow-x-auto">
 
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[650px]">
 
               <thead>
-                <tr className="border-b text-left text-gray-500">
 
-                  <th className="py-3">
+                <tr className="border-b border-gray-200 bg-gray-50/70 text-left text-gray-500">
+
+                  <th className="py-3 px-3 font-medium">
                     Description
                   </th>
 
-                  <th className="py-3">
+                  <th className="py-3 px-3 font-medium">
                     Category
                   </th>
 
-                  <th className="py-3">
+                  <th className="py-3 px-3 font-medium">
+                    Type
+                  </th>
+
+                  <th className="py-3 px-3 font-medium">
                     Date
                   </th>
 
-                  <th className="py-3 text-right">
+                  <th className="py-3 px-3 text-right font-medium">
                     Amount
                   </th>
 
                 </tr>
+
               </thead>
+
 
               <tbody>
 
@@ -360,37 +575,65 @@ function Dashboard() {
 
                     <tr
                       key={transaction._id}
-                      className="border-b last:border-b-0"
+                      className="border-b border-gray-100 last:border-b-0 hover:bg-gray-50/70 transition"
                     >
 
-                      <td className="py-3">
+                      <td className="py-3 px-3 font-medium text-gray-800">
                         {transaction.description}
                       </td>
 
-                      <td className="py-3 text-gray-600">
+
+                      <td className="py-3 px-3 text-gray-600">
                         {transaction.category}
                       </td>
 
-                      <td className="py-3 text-gray-600">
-                        {new Date(
-                          transaction.date
-                        ).toLocaleDateString("en-IN")}
+
+                      <td className="py-3 px-3">
+
+                        <span
+                          className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium ${
+                            transaction.type ===
+                            "income"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : "bg-red-100 text-red-600"
+                          }`}
+                        >
+                          {transaction.type}
+                        </span>
+
                       </td>
 
+
+                      <td className="py-3 px-3 text-gray-600 whitespace-nowrap">
+
+                        {new Date(
+                          transaction.date
+                        ).toLocaleDateString(
+                          "en-IN"
+                        )}
+
+                      </td>
+
+
                       <td
-                        className={`py-3 text-right font-semibold ${
-                          transaction.type === "income"
+                        className={`py-3 px-3 text-right font-semibold whitespace-nowrap ${
+                          transaction.type ===
+                          "income"
                             ? "text-emerald-600"
                             : "text-red-500"
                         }`}
                       >
-                        {transaction.type === "income"
+
+                        {transaction.type ===
+                        "income"
                           ? "+"
                           : "-"}
+
                         ₹
                         {transaction.amount.toLocaleString(
                           "en-IN"
                         )}
+
                       </td>
 
                     </tr>
@@ -413,113 +656,3 @@ function Dashboard() {
 }
 
 export default Dashboard;
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { useEffect, useState } from "react";
-// import api from "../services/api.js";
-// import { useAuth } from "../context/AuthContext.jsx";
-
-// function Dashboard() {
-//   const { user } = useAuth();
-
-//   const [summary, setSummary] = useState(null);
-//   const [monthlySummary, setMonthlySummary] = useState([]);
-//   const [expenseByCategory, setExpenseByCategory] = useState([]);
-
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState("");
-
-//   useEffect(() => {
-//     const getDashboardData = async () => {
-//       try {
-//         setLoading(true);
-//         setError("");
-
-//         const [ summaryResponse,
-//           monthlyResponse,
-//           categoryResponse
-//         ] = await Promise.all([
-//           api.get("/dashboard/summary"),
-//           api.get("/dashboard/monthly"),
-//           api.get("/dashboard/expense-by-category")
-//         ]);
-
-//         setSummary(summaryResponse.data);
-//         setMonthlySummary(
-//           monthlyResponse.data.monthlySummary
-//         );
-//         setExpenseByCategory(
-//           categoryResponse.data.expenseByCategory
-//         );
-//       } catch (error) {
-//         setError(
-//           error.response?.data?.message ||
-//             "Failed to load dashboard"
-//         );
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     getDashboardData();
-//   }, []);
-
-//   if (loading) {
-//     return <p>Loading dashboard...</p>;
-//   }
-
-//   if (error) {
-//     return <p className="text-red-500">{error}</p>;
-//   }
-
-//   return (
-//     <div>
-//       <h2 className="text-2xl font-bold">
-//         Good evening, {user?.name} 👋
-//       </h2>
-
-//       <p className="text-gray-500 mt-1">
-//         Here's your financial overview.
-//       </p>
-
-//       <div className="mt-6">
-//         <p>Total Income: ₹{summary?.totalIncome}</p>
-//         <p>Total Expenses: ₹{summary?.totalExpense}</p>
-//         <p>Balance: ₹{summary?.balance}</p>
-//       </div>
-
-//       <div className="mt-6">
-//         <h3 className="font-semibold">
-//           Monthly Summary
-//         </h3>
-
-//         <pre>
-//           {JSON.stringify(monthlySummary, null, 2)}
-//         </pre>
-//       </div>
-
-//       <div className="mt-6">
-//         <h3 className="font-semibold">
-//           Expense by Category
-//         </h3>
-
-//         <pre>
-//           {JSON.stringify(expenseByCategory, null, 2)}
-//         </pre>
-//       </div>
-//     </div>
-//   );
-// }
-
-// export default Dashboard;
