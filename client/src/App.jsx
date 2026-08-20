@@ -11,6 +11,7 @@ import DashboardLayout from "./layouts/DashboardLayout.jsx";
 import Transactions from "./pages/Transactions.jsx";
 import EditTransaction from "./pages/EditTransaction.jsx";
 import AddTransaction from "./pages/AddTransaction.jsx";
+import Reports from "./pages/Reports.jsx";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/transactions" element={<Transactions/>}/>
                 <Route path="/transactions/edit/:id"  element={<EditTransaction />}/>
                 <Route path="/transactions/add"  element={<AddTransaction />}/>
+                <Route path="/reports"  element={<Reports />}/>
               </Route>
           </Route>
       </Routes>

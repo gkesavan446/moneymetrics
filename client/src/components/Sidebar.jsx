@@ -24,6 +24,10 @@ function Sidebar(){
         <NavLink to="/transactions/add" className={linkClass}>
           Add Transaction
         </NavLink>
+
+        <NavLink  to="/reports"   className={linkClass}>
+            Reports
+        </NavLink>
       </nav>
     </aside>
   );

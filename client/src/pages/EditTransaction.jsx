@@ -42,7 +42,7 @@ function EditTransaction(){
                 
             } catch (error) {
                 console.log("error", error)
-                setError(error.response?.data?.message || "Failed to load transactionsss");
+                setError(error.response?.data?.message || "Failed to load transactions");
             } finally {
                 setLoading(false)
             }
