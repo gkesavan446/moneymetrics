@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { WalletCards, Mail } from "lucide-react";
+import { CircleDollarSign, Mail } from "lucide-react";
 import api from "../services/api.js";
 
 function ForgotPassword() {
@@ -51,7 +51,7 @@ function ForgotPassword() {
         <div className="flex flex-col items-center mb-6">
 
           <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
-            <WalletCards
+            <CircleDollarSign
               size={26}
               className="text-emerald-600"
             />

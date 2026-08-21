@@ -62,6 +62,12 @@ export const getMonthlySummary = async (req, res, next) => {
                         $sum: "$amount"
                     }
                 }
+            },
+            {
+                $sort: {
+                    "_id.year": 1,
+                    "_id.month": 1
+                }
             }
         ])
 

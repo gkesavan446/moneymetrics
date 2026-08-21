@@ -260,7 +260,7 @@ function AddTransaction() {
               onClick={() =>
                 navigate("/transactions")
               }
-              className="w-full sm:w-auto border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-50 transition"
+              className="w-full sm:w-auto border border-gray-300 text-gray-700 px-5 py-2.5 rounded-lg hover:bg-gray-300 transition"
             >
               Cancel
             </button>

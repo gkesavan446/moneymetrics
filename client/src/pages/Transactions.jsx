@@ -6,7 +6,7 @@ import api from "../services/api.js";
 function Transactions() {
   const [transactions, setTransactions] = useState([]);
   const [page, setPage] = useState(1);
-  const [search, setSearch] = useState("");
+ 
 
   const [pagination, setPagination] = useState({
     totalPages: 1,
@@ -22,6 +22,9 @@ function Transactions() {
   const [to, setTo] = useState("");
   const [sort, setSort] = useState("latest");
 
+  const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+
   const limit = 10;
 
   const handleClearFilters = () => {
@@ -34,6 +37,16 @@ function Transactions() {
     setPage(1);
   };
 
+    useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+    }, 700);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [search]);
+
   useEffect(() => {
     const getTransactions = async () => {
       try {
@@ -41,7 +54,7 @@ function Transactions() {
         setError("");
 
         const response = await api.get(
-          `/transactions?page=${page}&limit=${limit}&search=${search}&type=${type}&category=${category}&from=${from}&to=${to}&sort=${sort}`
+          `/transactions?page=${page}&limit=${limit}&search=${debouncedSearch}&type=${type}&category=${category}&from=${from}&to=${to}&sort=${sort}`
         );
 
         setTransactions(response.data.transactions);
@@ -60,17 +73,8 @@ function Transactions() {
         setLoading(false);
       }
     };
-
     getTransactions();
-  }, [
-    page,
-    search,
-    type,
-    category,
-    from,
-    to,
-    sort
-  ]);
+  }, [page, debouncedSearch, type, category, from, to, sort]);
 
   const handlePrevious = () => {
     if (page > 1) {
@@ -364,7 +368,7 @@ function Transactions() {
 
           <button
             onClick={handleClearFilters}
-            className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition"
+            className="w-full sm:w-auto px-4 py-2 border border-gray-300 rounded-lg text-sm text-gray-700 hover:bg-gray-300 transition"
           >
             Clear Filters
           </button>

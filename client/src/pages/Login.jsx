@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { WalletCards } from "lucide-react";
+import { CircleDollarSign } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import api from "../services/api.js";
 
@@ -63,7 +63,7 @@ function Login() {
 
           <div className="w-12 h-12 rounded-xl bg-emerald-100 flex items-center justify-center mb-3">
 
-            <WalletCards
+            <CircleDollarSign
               size={26}
               className="text-emerald-600"
             />

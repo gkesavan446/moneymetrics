@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Menu, LogOut, WalletCards } from "lucide-react";
+import { Menu, LogOut, CircleDollarSign } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import api from "../services/api.js";
 
@@ -37,7 +37,7 @@ function Navbar({ onMenuClick }) {
 
         <div className="flex items-center gap-2">
   <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center">
-    <WalletCards
+    <CircleDollarSign
       size={20}
       className="text-emerald-600"
     />
