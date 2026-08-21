@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { CircleDollarSign } from "lucide-react";
+import { CircleDollarSign, Eye, EyeOff } from "lucide-react";
 import api from "../services/api";
 
 function Register() {
@@ -12,6 +12,7 @@ function Register() {
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -151,23 +152,40 @@ function Register() {
 
             {/* Password */}
 
-            <div>
+                <div>
 
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Password
-              </label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                    Password
+                  </label>
 
-              <input
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                placeholder="Create a password"
-                className="w-full h-11 border border-gray-300 rounded-lg px-4 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
-                required
-              />
+                  <div className="relative">
 
-            </div>
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      value={formData.password}
+                      onChange={handleChange}
+                      placeholder="Create a password"
+                      className="w-full h-11 border border-gray-300 rounded-lg px-4 pr-11 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
+                      required
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
+                    >
+                      {showPassword ? (
+                        <EyeOff size={20} />
+                      ) : (
+                        <Eye size={20} />
+                      )}
+                    </button>
+
+                  </div>
+
+                </div>
 
 
             {/* Submit */}
